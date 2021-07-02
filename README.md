@@ -1,6 +1,6 @@
 DFXML
 =====
-[![Build Status](https://travis-ci.com/simsong/dfxml.svg?branch=master)](https://travis-ci.com/simsong/dfxml)
+[![Build Status](https://github.com/dfxml-working-group/dfxml_cpp/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/dfxml-working-group/dfxml_cpp/actions/workflows/continuous-integration.yml/)
 
 Welcome to the Digital Forensics XML (DFXML) git repository.
 
