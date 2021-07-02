@@ -13,3 +13,4 @@ cpu_stat
 *.tar.gz
 *.gcda
 *.gcno
+ltmain.sh

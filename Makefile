@@ -1,15 +1,19 @@
 #!/usr/bin/make -f
 
-# This software was developed at the National Institute of Standards
-# and Technology by employees of the Federal Government in the course
-# of their official duties. Pursuant to title 17 Section 105 of the
-# United States Code this software is not subject to copyright
-# protection and is in the public domain. NIST assumes no
-# responsibility whatsoever for its use by other parties, and makes
-# no guarantees, expressed or implied, about its quality,
-# reliability, or any other characteristic.
+# This software is a work of the Naval Postgraduate School (NPS) and the
+# National Institute of Standards and Technology (NIST) . As a work of
+# the US Government this work is not subject to copyright law. Neither
+# NPS nor NIST assumes any responsibility whatsoever for its use by
+# other parties, and makes no guarantees, expressed or implied, about
+# its quality, reliability, or any other characteristic.
+
+# Additionally, we waive copyright and related rights in the work worldwide
+# through the CC0 1.0 Universal public domain dedication at https://creativecommons.org/publicdomain/zero/1.0/.
 #
-# We would appreciate acknowledgement if the software is used.
+# Contributions by non-US government entities herein are covered under the LGPL
+# which is in src/COPYING.md
+
+
 
 SHELL ?= /bin/bash
 

@@ -12,7 +12,6 @@ AC_MSG_NOTICE([Note: checks for libewf.h should be in the caller, so they can be
 AC_CHECK_HEADERS([err.h expat.h pwd.h sys/cdefs.h sys/mman.h sys/resource.h sys/utsname.h unistd.h winsock2.h ])
 AC_CHECK_FUNCS([fork gmtime_r getuid gethostname getpwuid getrusage mkstemp vasprintf ])
 
-
 # Determine UTC date offset
 CPPFLAGS="$CPPFLAGS -DUTC_OFFSET=`TZ=UTC date +%z`"
 
@@ -24,13 +23,11 @@ AM_COND_IF([FOUND_GIT],
          AC_MSG_NOTICE([git commit $GIT_COMMIT])],
         [AC_MSG_WARN([git not found])])
 
-
 # Do we have the CPUID instruction?
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#define cpuid(id) __asm__( "cpuid" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "a"(id), "b"(0), "c"(0), "d"(0))]], [[unsigned long eax, ebx, ecx, edx;cpuid(0);]])],[have_cpuid=yes],[have_cpuid=no])
 if test "$have_cpuid" = yes; then
   AC_DEFINE(HAVE_ASM_CPUID, 1, [define to 1 if __asm__ CPUID is available])
 fi
-
 
 ################################################################
 ## on Win32, crypto requires zlib

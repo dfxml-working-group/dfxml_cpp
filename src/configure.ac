@@ -15,7 +15,7 @@ m4_include([m4/ax_cxx_compile_stdcxx.m4])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE
 
 # Initialize libtool support
@@ -72,6 +72,12 @@ GCC_WARNINGS_TO_TEST="-MD -Wpointer-arith -Wmissing-declarations -Wmissing-proto
     -Wfloat-equal -Wmultichar -Wc++-compat -Wmissing-noreturn -Wno-deprecated-declarations \
     -Wno-unknown-warning-option"
 
+CXX_WARNINGS_TO_TEST="-Wall -MD -Wpointer-arith -Wshadow -Wwrite-strings -Wcast-align  \
+    -Wredundant-decls -Wdisabled-optimization -Wfloat-equal -Wmultichar -Wmissing-noreturn \
+    -Wstrict-null-sentinel -Woverloaded-virtual -Wsign-promo -Wno-deprecated-declarations \
+    -funit-at-a-time"
+
+
 if test x"${mingw}" != "xyes" ; then
   # add the warnings we do not want to do on mingw
   GCC_WARNINGS_TO_TEST="$GCC_WARNINGS_TO_TEST -Wall -Wstrict-prototypes"
@@ -108,14 +114,6 @@ unset option
 # 2020-06-04 removed ‘-Wno-unknown-warning-option’
 AC_LANG_PUSH(C++)
 
-CXX_WARNINGS_TO_TEST="-Wall -MD -Wpointer-arith \
-    -Wshadow -Wwrite-strings -Wcast-align  \
-    -Wredundant-decls -Wdisabled-optimization \
-    -Wfloat-equal -Wmultichar -Wmissing-noreturn \
-    -Wstrict-null-sentinel -Woverloaded-virtual -Wsign-promo \
-    -Wno-deprecated-declarations \
-    -funit-at-a-time"
-
 if test x"${mingw}" != "xyes" ; then
   # add the warnings we don't want to do on mingw
   CXX_WARNINGS_TO_TEST="$CXX_WARNINGS_TO_TEST  -Weffc++"
@@ -146,8 +144,6 @@ AC_LANG_POP()
 # script's behavior did not change.  They are probably safe to remove.
 AC_CHECK_INCLUDES_DEFAULT
 AC_PROG_EGREP
-
-
 
 ################################################################
 ## os-specific fixups
