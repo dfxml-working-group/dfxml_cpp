@@ -3,7 +3,7 @@
 # 2020-06-22 - slg - customized
 # 2020-06-27 - slg - expanded to G++ for MacOS
 #
-name: CI (pytest and c++)
+name: CI (c++)
 on: [push]
 
 jobs:
@@ -12,7 +12,6 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-20.04', 'macos-10.15']
-        python-version: [3.8, 3.9]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -32,27 +31,6 @@ jobs:
         run: |
           wget https://ftpmirror.gnu.org/autoconf/autoconf-2.71.tar.gz
           tar xfz autoconf-2.71.tar.gz && cd autoconf-2.71 && ./configure && make && sudo make install
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install Python dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest pytest-cov
-          if [ -r requirements.txt ];     then pip install -r requirements.txt ;     fi
-          if [ -r requirements-dev.txt ]; then pip install -r requirements-dev.txt ; fi
-
-      - name: Test with pytest
-        run: pytest --cov=./ --cov-report=xml python
-
-      - name: schema test
-        run: |
-          make schema-init
-          cd python/tests/test_venv
-          echo disabled until https://github.com/simsong/dfxml/issues/39 is resolved.
 
       - name: Run C++
         run: |
