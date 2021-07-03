@@ -45,15 +45,15 @@ jobs:
       - name: Run C++ checks
         run: |
           make check
-      
+
 
       - name: Run codecov on the C++
         if: startsWith(matrix.os, 'ubuntu')
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
-          ./configure CFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' CXXFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' LIBS='-lgcov'
           cd src
+          ./configure CFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' CXXFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' LIBS='-lgcov'
           make check
           gcov-9 -n -o . *cpp
           bash <(curl -s https://codecov.io/bash)
