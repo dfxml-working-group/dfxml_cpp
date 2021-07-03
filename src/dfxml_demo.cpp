@@ -1,4 +1,4 @@
-#include "config.h"
+#include "dfxml_config.h"
 #include "dfxml_reader.h"
 
 
@@ -25,4 +25,3 @@ int main(int argc,char **argv)
     dfxml::file_object_reader::read_dfxml(argv[1],process);
     return 0;
 }
-
