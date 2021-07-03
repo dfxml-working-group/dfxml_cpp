@@ -4,7 +4,7 @@
 # 2020-06-27 - slg - expanded to G++ for MacOS
 #
 name: CI (pytest and c++)
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
