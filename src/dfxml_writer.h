@@ -21,7 +21,7 @@
 #ifndef DFXML_WRITER_H
 #define DFXML_WRITER_H
 
-#ifndef PACKAGE
+#ifndef PACKAGE_NAME
 #error This file requires that an autoconf-generated config.h (or equivallent) file be included first.
 #endif
 

@@ -25,7 +25,7 @@
  * LICENSE: LGPL Version 3. See COPYING.md for further information.
  */
 
-#ifndef PACKAGE
+#ifndef PACKAGE_NAME
 #error This file requires that an autoconf-generated config.h (or equivallent) file be included first.
 #endif
 
