@@ -18,6 +18,11 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 
+# Add support for the --enable-shared, --disable-shared, ... flags
+# This is needed for the check within bootstrap.sh, wether to run
+# libtoolize or not
+AM_PROG_LIBTOOL
+
 # Initialize libtool support
 LT_PREREQ([2.4.6])
 LT_INIT([shared])
@@ -144,7 +149,7 @@ AC_LANG_POP()
 #
 # Autoupdate added the next two lines to ensure that your configure
 # script's behavior did not change.  They are probably safe to remove.
-AC_CHECK_INCLUDES_DEFAULT
+#AC_CHECK_INCLUDES_DEFAULT
 AC_PROG_EGREP
 
 
