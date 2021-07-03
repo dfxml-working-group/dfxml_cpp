@@ -24,7 +24,8 @@
  *      byte_runs but not fs_offset
  */
 
-#include "config.h"
+#include "dfxml_config.h"
+
 #include <iostream>
 #include <string>
 #include <cstdlib>
