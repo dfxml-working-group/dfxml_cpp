@@ -1,5 +1,15 @@
 #define CATCH_CONFIG_MAIN
 #include "config.h"
+
+#if defined(PACKAGE_VERSION && !defined(VERSION)
+#define VERSION PACKAGE_VERSION
+#endif
+
+#if !defined(VERSION)
+#define VERSION "UNKNOWN"
+#endif
+
+
 #include "tests/catch.hpp"
 
 #include "hash_t.h"
