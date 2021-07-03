@@ -1,12 +1,12 @@
 #define CATCH_CONFIG_MAIN
 #include "config.h"
 
-#if defined(PACKAGE_VERSION && !defined(VERSION)
-#define VERSION PACKAGE_VERSION
-#endif
-
-#if !defined(VERSION)
+#ifndef VERSION
+#ifdef PACKAGE_VERSION
+#define PACKAGE_VERSION VERSION
+#else
 #define VERSION "UNKNOWN"
+#endif
 #endif
 
 
