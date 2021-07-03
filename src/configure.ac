@@ -29,7 +29,8 @@ AM_MAINTAINER_MODE
 # Add support for the --enable-shared, --disable-shared, ... flags
 # This is needed for the check within bootstrap.sh, wether to run
 # libtoolize or not
-AM_PROG_LIBTOOL
+# "warning: The macro `AM_PROG_LIBTOOL' is obsolete."
+# AM_PROG_LIBTOOL
 
 # Initialize libtool support
 LT_PREREQ([2.4.6])

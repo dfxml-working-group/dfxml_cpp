@@ -37,6 +37,7 @@
 #include <sstream>
 #include <functional>
 #include <cstdint>
+#include <fstream>
 
 #ifdef HAVE_EXPAT_H
 #include <expat.h>
@@ -56,10 +57,11 @@
 #endif
 
 
-
 #include "hash_t.h"
 
 namespace dfxml {
+
+    extern const char *dfxml_version();
 
     class saxobject {
     public:
@@ -119,22 +121,19 @@ namespace dfxml {
         return os;
     };
 
-    };
-
-
-    class imageobject_sax:public saxobject {
+    class imageobject_sax:public dfxml::saxobject {
     public:
         virtual ~imageobject_sax(){};
     };
 
-    class volumeobject_sax:public saxobject {
+    class volumeobject_sax:public dfxml::saxobject {
     public:;
         volumeobject_sax():saxobject(),block_size(),image(){}
         uint64_t block_size;
         imageobject_sax image;
     };
 
-    class file_object:public saxobject {
+    class file_object:public dfxml::saxobject {
     public:;
         file_object():saxobject(),volumeobject(0),byte_runs() { };
         file_object(const file_object &that):saxobject(that),volumeobject(that.volumeobject),
@@ -148,7 +147,7 @@ namespace dfxml {
             return *this;
         }
 
-        typedef std::vector<byte_run> byte_runs_t;
+        typedef std::vector<dfxml::byte_run> byte_runs_t;
         volumeobject_sax *volumeobject;
         byte_runs_t byte_runs;
 
@@ -156,37 +155,40 @@ namespace dfxml {
         dfxml::md5_t md5() const {
             std::map<std::string,std::string>::const_iterator it = hashdigest.find("md5");
             if(it!=hashdigest.end()) return dfxml::md5_t::fromhex(it->second);
-            throw new no_hash();
+            throw new dfxml::no_hash();
         }
     };
+};
 
-    typedef std::function<void (file_object&)> fileobject_callback_t;
+typedef std::function<void (dfxml::file_object&)> fileobject_callback_t;
 
-    class dfxml_reader {
-    public:
-        dfxml_reader():tagstack(),cdata(){}
-        virtual ~dfxml_reader(){}
-        static std::string getattrs(const char **attrs,const std::string &name) {
-            for(int i=0;attrs[i];i+=2){
-                if(name==attrs[i]) return std::string(attrs[i+1]);
-            }
-            return std::string("");
+class dfxml_reader {
+public:
+    dfxml_reader():tagstack(),cdata(){}
+    virtual ~dfxml_reader(){}
+    static std::string getattrs(const char **attrs,const std::string &name) {
+        for(int i=0;attrs[i];i+=2){
+            if(name==attrs[i]) return std::string(attrs[i+1]);
         }
-        static uint64_t getattri(const char **attrs,const std::string &name) {
-            std::stringstream ss;
-            for(int i=0;attrs[i];i+=2){
-                if(name==attrs[i]){
-                    ss << attrs[i+1];
-                    uint64_t val;
-                    ss >> val;
-                    return val;
-                }
+        return std::string("");
+    }
+    static uint64_t getattri(const char **attrs,const std::string &name) {
+        std::stringstream ss;
+        for(int i=0;attrs[i];i+=2){
+            if(name==attrs[i]){
+                ss << attrs[i+1];
+                uint64_t val;
+                ss >> val;
+                return val;
             }
-            return 0;
         }
-        std::stack<std::string> tagstack;
-        std::stringstream cdata;
-    };
+        return 0;
+    }
+    std::stack<std::string> tagstack;
+    std::stringstream cdata;
+};
+
+namespace dfxml {
 
     class file_object_reader:public dfxml_reader{
     private:
@@ -202,14 +204,14 @@ namespace dfxml {
             self.cdata.str("");
             self.tagstack.push(name);
             if(name=="volume"){
-                self.volumeobject = new volumeobject_sax();
+                self.volumeobject = new dfxml::volumeobject_sax();
                 self.volumeobject->block_size = 512; // default
             }
             if(name=="block_size"){
                 /* pass */
             }
             if(name=="fileobject"){
-                self.fileobject = new file_object();
+                self.fileobject = new dfxml::file_object();
                 self.fileobject->volumeobject = self.volumeobject;
                 return;
             }
@@ -218,7 +220,7 @@ namespace dfxml {
                 return;
             }
             if(self.fileobject && (name=="run" || name=="byte_run")){
-                byte_run run;
+                dfxml::byte_run run;
                 for(int i=0;attrs[i];i+=2){
                     if(run.img_offset==0 && !strcmp(attrs[i],"img_offset")){run.img_offset = std::atoi(attrs[i+1]);continue;}
                     if(run.file_offset==0 && !strcmp(attrs[i],"file_offset")){run.file_offset = std::atoi(attrs[i+1]);continue;}
@@ -314,12 +316,11 @@ namespace dfxml {
 
         virtual ~file_object_reader(){};
         file_object_reader(): dfxml_reader(),volumeobject(),fileobject(),callback(),hashdigest_type(){}
-        volumeobject_sax *volumeobject;
-        file_object *fileobject;		// the object currently being read
+        dfxml::volumeobject_sax *volumeobject;
+        dfxml::file_object *fileobject;		// the object currently being read
         fileobject_callback_t callback;
         std::string hashdigest_type;
     };
 };
-
 
 #endif

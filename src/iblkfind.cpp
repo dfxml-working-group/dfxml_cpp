@@ -57,13 +57,13 @@ class byte_run_t {
      * @param _len
      * @param _filename
      */
-    byte_run_t(uint64_t _file_offset, 
+    byte_run_t(uint64_t _file_offset,
                uint64_t _img_offset,  uint64_t _len,
                const std::string& _filename) :
       file_offset(_file_offset)
      ,img_offset(_img_offset)
      ,len(_len)
-     ,filename(_filename) { 
+     ,filename(_filename) {
     }
     ///@}
 
@@ -73,7 +73,7 @@ class byte_run_t {
      * @param rhs
      */
     inline bool operator<(const byte_run_t& rhs) const {
-      return (img_offset < rhs.img_offset) or 
+      return (img_offset < rhs.img_offset) or
              (img_offset == rhs.img_offset and len < rhs.len);
     }
 
@@ -85,7 +85,7 @@ class byte_run_t {
      */
     friend std::ostream& operator<<(std::ostream& out, const byte_run_t& item) {
       out << "[" << item.file_offset
-          << " " << item.img_offset  << " " << item.len 
+          << " " << item.img_offset  << " " << item.len
           << " " << item.filename << "]";
       return out;
     }
@@ -117,7 +117,7 @@ class extents_t {
       dfxml_filename(p_dfxml_filename),extents() {
 
         dfxml::file_object_reader::read_dfxml(
-            dfxml_filename, 
+            dfxml_filename,
             [&] (dfxml::file_object& fi) { // lambda function to process byte_runs into the extents set
                 for(const auto& item : fi.byte_runs) {
                     extents.emplace(item.file_offset,item.img_offset, item.len, fi.filename());
@@ -133,7 +133,7 @@ class extents_t {
      * Returns a reference to the byte_run or throws a std::range_error
      * if no byte_run found.
      *
-     * @param[in] offset 
+     * @param[in] offset
      */
     const byte_run_t& find(uint64_t offset) {
 
@@ -161,7 +161,7 @@ int main(int argc, char** argv) {
   extents_t extents(argv[1]);
 
   // A test list of offsets to look up
-  std::vector<uint64_t> offsets = { 
+  std::vector<uint64_t> offsets = {
         2098176, 2621440, 3146752, 3163136, 3195904,
         3212288, 3687424, 4195328, 8908800, 8913920,
         9044992, 9208832, 9305088, 9306112, 9307136,
