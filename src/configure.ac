@@ -1,12 +1,20 @@
 #                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
-# Order is largely irrelevant, although it must start with AC_INIT and end with AC_OUTPUT
-# See http://autotoolset.sourceforge.net/tutorial.html
-# and http://www.openismus.com/documents/linux/automake/automake.shtml
+#
+# This configure script is for creating dfxml_config.h, which is used for the
+# config file used by the unittest (testapp_catch2.cpp) program.
+# That is the sole purpose of this script.
+#
+# It includes dfxml_configure.mx, which is a mix-in for using dfxml
 
+# LICENSE
 #
-# This file is public domain
+# Copyright (c) 2021, Simson L. Garfinkel <simsong@acm.org>
 #
+#   Copying and distribution of this file, with or without modification, are
+#   permitted in any medium without royalty provided the copyright notice
+#   and this notice are preserved.  This file is offered as-is, without any
+#   warranty.
+
 
 AC_PREREQ([2.69])
 AC_INIT([DFXML],[1.0.1],[bugs@digitalcorpora.org])
@@ -14,14 +22,15 @@ AC_CONFIG_MACRO_DIR(m4)
 m4_include([m4/ax_cxx_compile_stdcxx.m4])
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE
+AC_CONFIG_HEADERS([dfxml_config.h])
+AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE
 
 # Add support for the --enable-shared, --disable-shared, ... flags
 # This is needed for the check within bootstrap.sh, wether to run
 # libtoolize or not
-AM_PROG_LIBTOOL
+# "warning: The macro `AM_PROG_LIBTOOL' is obsolete."
+# AM_PROG_LIBTOOL
 
 # Initialize libtool support
 LT_PREREQ([2.4.6])
@@ -41,20 +50,6 @@ AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
 AC_LANG_POP()
 
 m4_include([dfxml_configure.m4])
-
-
-################################################################
-## Expat
-## Required for S3 and Digital Signatures
-##
-AC_ARG_WITH(expat,
-  AS_HELP_STRING([--with-expat=PATH], [where libexpat is compiled (if it isn't installed); required for S3 and Digital Signatures]),
-  [LDFLAGS="-L${with_expat} $LDFLAGS" ;
-   CPPFLAGS="-I${with_expat}/lib $CPPFLAGS"])
-
-have_expat=yes
-AC_CHECK_HEADER([expat.h])
-AC_CHECK_LIB([expat],[XML_ParserCreate],,[have_expat="no ";AC_MSG_WARN([expat not found; S3 and Digital Signatures not enabled])])
 
 ################################################################
 #
@@ -76,6 +71,11 @@ GCC_WARNINGS_TO_TEST="-MD -Wpointer-arith -Wmissing-declarations -Wmissing-proto
     -Wbad-function-cast -Wcast-qual -Wundef -Wredundant-decls -Wdisabled-optimization \
     -Wfloat-equal -Wmultichar -Wc++-compat -Wmissing-noreturn -Wno-deprecated-declarations \
     -Wno-unknown-warning-option"
+
+CXX_WARNINGS_TO_TEST="-Wall -MD -Wpointer-arith -Wshadow -Wwrite-strings -Wcast-align  \
+    -Wredundant-decls -Wdisabled-optimization -Wfloat-equal -Wmultichar -Wmissing-noreturn \
+    -Wstrict-null-sentinel -Woverloaded-virtual -Wsign-promo -Wno-deprecated-declarations \
+    -funit-at-a-time"
 
 if test x"${mingw}" != "xyes" ; then
   # add the warnings we do not want to do on mingw
@@ -113,14 +113,6 @@ unset option
 # 2020-06-04 removed ‘-Wno-unknown-warning-option’
 AC_LANG_PUSH(C++)
 
-CXX_WARNINGS_TO_TEST="-Wall -MD -Wpointer-arith \
-    -Wshadow -Wwrite-strings -Wcast-align  \
-    -Wredundant-decls -Wdisabled-optimization \
-    -Wfloat-equal -Wmultichar -Wmissing-noreturn \
-    -Wstrict-null-sentinel -Woverloaded-virtual -Wsign-promo \
-    -Wno-deprecated-declarations \
-    -funit-at-a-time"
-
 if test x"${mingw}" != "xyes" ; then
   # add the warnings we don't want to do on mingw
   CXX_WARNINGS_TO_TEST="$CXX_WARNINGS_TO_TEST  -Weffc++"
@@ -151,8 +143,6 @@ AC_LANG_POP()
 # script's behavior did not change.  They are probably safe to remove.
 #AC_CHECK_INCLUDES_DEFAULT
 AC_PROG_EGREP
-
-
 
 ################################################################
 ## os-specific fixups

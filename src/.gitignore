@@ -13,3 +13,9 @@ cpu_stat
 *.tar.gz
 *.gcda
 *.gcno
+ltmain.sh
+libtool
+.libs
+dfxml_config.h
+dfxml_config.h.in
+*.la

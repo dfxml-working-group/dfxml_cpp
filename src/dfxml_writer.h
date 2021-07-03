@@ -1,12 +1,29 @@
 /* -*- mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+
 /*
  * Simson's XML output class.
  * Include this AFTER your config file with the HAVE statements.
  * Optimized for DFXML generation.
  */
 
+/*
+ * Revision History:
+ * 2012 - Simson L. Garfinkel - Developed as test program.
+ * 2021 - Cleaned up. Added LGPL copyright notice.
+ *
+ * Copyright (C) 2021 Simson L. Garfinkel.
+ *
+ * LICENSE: LGPL Version 3. See COPYING.md for further information.
+ */
+
+
+
 #ifndef DFXML_WRITER_H
 #define DFXML_WRITER_H
+
+#ifndef PACKAGE_NAME
+#error This file requires that an autoconf-generated config.h (or equivallent) file be included first.
+#endif
 
 /* c++ */
 #include <cassert>
@@ -14,6 +31,7 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
+#include <cstdarg>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -23,35 +41,33 @@
 #include <stack>
 #include <string>
 #include <stdexcept>
-#include <stdarg.h>
 
 #include <sys/time.h>
 
+// Windows-specific
 
 #ifdef _MSC_VER
 # include <io.h>
-#else
-# include <unistd.h>
 #endif
 
-#ifdef HAVE_SQLITE3_H
-#include <sqlite3.h>
+#ifdef WIN32
+#include <psapi.h>
 #endif
 
-#ifdef HAVE_HASHDB
-#include <hashdb.hpp>
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
 #endif
 
-#ifdef HAVE_SYS_CDEFS_H
-#include <sys/cdefs.h>
+// Unix/Linux Specific
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
 #endif
+
+// Common
 
 #ifdef HAVE_SYS_RESOURCE_H
-#include <sys/resource.h>
-#endif
-
-#ifdef HAVE_PWD_H
-#include <pwd.h>
+#include <sys/resource.h>               // for getrusage
 #endif
 
 #ifdef HAVE_SYS_UTSNAME_H
@@ -66,20 +82,19 @@
 #include <libewf.h>
 #endif
 
-#ifdef WIN32
-#include <psapi.h>
-#endif
-
-#ifdef HAVE_WINSOCK2_H
-#include <winsock2.h>
-#endif
-
 #ifdef HAVE_BOOST_VERSION_HPP
 #include <boost/version.hpp>
 #endif
 
-#include "cpuid.h"
+#ifdef HAVE_PWD_H
+#include <pwd.h>
+#endif
 
+#ifdef UUID_UUID_H
+#include <uuid/uuid.h>
+#endif
+
+#include "cpuid.h"
 
 class dfxml_writer {
 public:

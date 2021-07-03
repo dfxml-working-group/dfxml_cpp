@@ -1,5 +1,12 @@
+
 #define CATCH_CONFIG_MAIN
-#include "config.h"
+#include "dfxml_config.h"
+
+#ifndef VERSION
+#define VERSION "NO VERSION"
+#endif
+
+
 #include "tests/catch.hpp"
 
 #include "hash_t.h"

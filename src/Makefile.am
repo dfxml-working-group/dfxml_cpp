@@ -1,14 +1,14 @@
 # (C) 2020 Simson L. Garfinkel
 # https://www.gnu.org/licenses/lgpl-3.0.en.html
 
-DFXML_SRC_DIR = 
+DFXML_SRC_DIR =
 ACLOCAL_AMFLAGS = -I m4
 
 include Makefile.defs
 
 # Build dfxml as a library
 lib_LTLIBRARIES = libdfxml.la
-libdfxml_la_SOURCES = $(DFXML_WRITER) $(DFXML_READER)
+libdfxml_la_SOURCES = $(DFXML_WRITER) $(DFXML_READER) dfxml_version.cpp
 libdfxml_la_LDFLAGS = -version-info 0:0:0
 include_HEADERS  = dfxml_reader.h dfxml_writer.h
 
@@ -20,7 +20,7 @@ dfxml_demo_LDADD = ./libdfxml.la
 iblkfind_SOURCES = iblkfind.cpp
 iblkfind_LDADD = ./libdfxml.la
 
-EXTRA_DIST = README.md 
+EXTRA_DIST = README.md
 
 check_PROGRAMS = testapp_catch2
 TESTS = $(check_PROGRAMS)

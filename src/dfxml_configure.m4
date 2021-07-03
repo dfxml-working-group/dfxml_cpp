@@ -2,16 +2,24 @@
 # mix-ins for dfxml
 # Support for hash_t as well.
 #
-# This file is public domain
 # Revision History:
 # 2012 - Simson Garfinkel - Created for bulk_extractor
+# 2021 - Simson Garfinkel - Cleaned up. Added LGPL copyright notice.
+#
+# Copyright (C) 2021 Simson L. Garfinkel.
+#
+# LICENSE: LGPL Version 3. See COPYING.md for further information.
 #
 
 AC_MSG_NOTICE([Including dfxml_configure.m4 from dfxml])
 AC_MSG_NOTICE([Note: checks for libewf.h should be in the caller, so they can be disabled])
-AC_CHECK_HEADERS([err.h expat.h pwd.h sys/cdefs.h sys/mman.h sys/resource.h sys/utsname.h unistd.h winsock2.h ])
-AC_CHECK_FUNCS([fork gmtime_r getuid gethostname getpwuid getrusage mkstemp vasprintf ])
+AC_CHECK_HEADERS([expat.h sys/resource.h sys/utsname.h unistd.h winsock2.h boost/version.hpp pwd.h uuid/uuid.h])
+AC_CHECK_FUNCS([gmtime_r getuid gethostname getpwuid getrusage vasprintf ])
 
+# Expat is required
+have_expat=yes
+AC_CHECK_HEADER([expat.h])
+AC_CHECK_LIB([expat],[XML_ParserCreate],,[have_expat="no ";AC_MSG_WARN([expat not found; S3 and Digital Signatures not enabled])])
 
 # Determine UTC date offset
 CPPFLAGS="$CPPFLAGS -DUTC_OFFSET=`TZ=UTC date +%z`"
@@ -24,13 +32,11 @@ AM_COND_IF([FOUND_GIT],
          AC_MSG_NOTICE([git commit $GIT_COMMIT])],
         [AC_MSG_WARN([git not found])])
 
-
 # Do we have the CPUID instruction?
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#define cpuid(id) __asm__( "cpuid" : "=a"(eax), "=b"(ebx), "=c"(ecx), "=d"(edx) : "a"(id), "b"(0), "c"(0), "d"(0))]], [[unsigned long eax, ebx, ecx, edx;cpuid(0);]])],[have_cpuid=yes],[have_cpuid=no])
 if test "$have_cpuid" = yes; then
   AC_DEFINE(HAVE_ASM_CPUID, 1, [define to 1 if __asm__ CPUID is available])
 fi
-
 
 ################################################################
 ## on Win32, crypto requires zlib

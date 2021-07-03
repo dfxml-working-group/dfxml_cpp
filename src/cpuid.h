@@ -1,4 +1,13 @@
-// https://stackoverflow.com/questions/1666093/cpuid-implementations-in-c
+/*
+ * Revision History:
+ *  2015 - Initial implementation, based on https://stackoverflow.com/questions/1666093/cpuid-implementations-in-c
+ *  2021 - Cleaned up. Added LGPL copyright notice.
+ *
+ * Copyright (C) 2021 Simson L. Garfinkel.
+ *
+ * LICENSE: LGPL Version 3. See COPYING.md for further information.
+ */
+
 #ifndef CPUID_H
 #define CPUID_H
 
