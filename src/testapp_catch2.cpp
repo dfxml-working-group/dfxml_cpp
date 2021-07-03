@@ -1,14 +1,6 @@
+
 #define CATCH_CONFIG_MAIN
-#include "config.h"
-
-#ifndef VERSION
-#ifdef PACKAGE_VERSION
-#define PACKAGE_VERSION VERSION
-#else
-#define VERSION "UNKNOWN"
-#endif
-#endif
-
+#include "dfxml_config.h"
 
 #include "tests/catch.hpp"
 

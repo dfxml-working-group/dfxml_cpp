@@ -2,9 +2,13 @@
 # mix-ins for dfxml
 # Support for hash_t as well.
 #
-# This file is public domain
 # Revision History:
 # 2012 - Simson Garfinkel - Created for bulk_extractor
+# 2021 - Simson Garfinkel - Cleaned up. Added LGPL copyright notice.
+#
+# Copyright (C) 2021 Simson L. Garfinkel.
+#
+# LICENSE: LGPL Version 3. See COPYING.md for further information.
 #
 
 AC_MSG_NOTICE([Including dfxml_configure.m4 from dfxml])
