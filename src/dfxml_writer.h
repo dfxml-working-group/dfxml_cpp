@@ -27,31 +27,30 @@
 
 #include <sys/time.h>
 
+// Windows-specific
 
 #ifdef _MSC_VER
 # include <io.h>
-#else
-# include <unistd.h>
 #endif
 
-#ifdef HAVE_SQLITE3_H
-#include <sqlite3.h>
+#ifdef WIN32
+#include <psapi.h>
 #endif
 
-#ifdef HAVE_HASHDB
-#include <hashdb.hpp>
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
 #endif
 
-#ifdef HAVE_SYS_CDEFS_H
-#include <sys/cdefs.h>
+// Unix/Linux Specific
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
 #endif
+
+// Common
 
 #ifdef HAVE_SYS_RESOURCE_H
-#include <sys/resource.h>
-#endif
-
-#ifdef HAVE_PWD_H
-#include <pwd.h>
+#include <sys/resource.h>               // for getrusage
 #endif
 
 #ifdef HAVE_SYS_UTSNAME_H
@@ -66,20 +65,11 @@
 #include <libewf.h>
 #endif
 
-#ifdef WIN32
-#include <psapi.h>
-#endif
-
-#ifdef HAVE_WINSOCK2_H
-#include <winsock2.h>
-#endif
-
 #ifdef HAVE_BOOST_VERSION_HPP
 #include <boost/version.hpp>
 #endif
 
 #include "cpuid.h"
-
 
 class dfxml_writer {
 public:

@@ -2,7 +2,9 @@
 #
 # This configure script is for creating dfxml_config.h, which is used for the
 # config file used by the unittest (testapp_catch2.cpp) program.
+# That is the sole purpose of this script.
 #
+# It includes dfxml_configure.mx, which is a mix-in for using dfxml
 
 # LICENSE
 #
@@ -68,7 +70,6 @@ CXX_WARNINGS_TO_TEST="-Wall -MD -Wpointer-arith -Wshadow -Wwrite-strings -Wcast-
     -Wredundant-decls -Wdisabled-optimization -Wfloat-equal -Wmultichar -Wmissing-noreturn \
     -Wstrict-null-sentinel -Woverloaded-virtual -Wsign-promo -Wno-deprecated-declarations \
     -funit-at-a-time"
-
 
 if test x"${mingw}" != "xyes" ; then
   # add the warnings we do not want to do on mingw

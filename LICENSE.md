@@ -29,7 +29,6 @@ In no way are the patent or trademark rights of any person affected by CC0, nor 
 
 Unless expressly stated otherwise, the person who associated a work with this deed makes no warranties about the work, and disclaims liability for all uses of the work, to the fullest extent permitted by applicable law. When using or citing the work, you should not imply endorsement by the author or the affirmer.
 
-
 ## LGPL Version 3, 29 June 2007
 
 Contributions by non-US government entities herein are covered under the LGPL, which is included below.
@@ -199,4 +198,3 @@ Library.  A suitable mechanism is one that (a) uses at run time
   apply, that proxy's public statement of acceptance of any version is
   permanent authorization for you to choose that version for the
   Library.
-

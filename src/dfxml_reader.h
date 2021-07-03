@@ -8,14 +8,17 @@
  ** For a full implementation, please see ../python/dfxml.py
  **
  ** If you want to add support for a specific DFXML tag, please add it
- ** and submit your patch as a pull request on github.  
+ ** and submit your patch as a pull request on github.
  **/
- 
+
 /*
  * Revision History:
- * 2012 - Simson L. Garfinkel - Developed as test program. 
+ * 2012 - Simson L. Garfinkel - Developed as test program.
+ * 2021 - Cleaned up. Added LGPL copyright notice.
  *
- * This file is public domain.
+ * Copyright (C) 2021 Simson L. Garfinkel.
+ *
+ * LICENSE: LGPL Version 3. See COPYING.md for further information.
  */
 
 #include <cstdio>
@@ -26,12 +29,6 @@
 #include <sstream>
 #include <functional>
 #include <cstdint>
-
-#ifdef HAVE_EXPAT_H
-#include <expat.h>
-#else
-#error dfxml_reader.h requires expat.h
-#endif
 
 #include "hash_t.h"
 
