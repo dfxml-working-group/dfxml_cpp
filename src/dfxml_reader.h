@@ -2,13 +2,17 @@
 #define DFXML_READER_H
 
 /**
- ** NOTE:
+ ** NOTE 1:
  ** THIS IS NOT A COMPLETE IMPLEMENTATION.
  ** This is a skeletal implementation of a DFXML reader to solve an immediate problem.
  ** For a full implementation, please see ../python/dfxml.py
  **
  ** If you want to add support for a specific DFXML tag, please add it
  ** and submit your patch as a pull request on github.
+ **
+ **
+ ** NOTE 2:
+ ** You *must* include an autoconf-generated config.h (or equivallent) file before including this file.
  **/
 
 /*
@@ -21,6 +25,10 @@
  * LICENSE: LGPL Version 3. See COPYING.md for further information.
  */
 
+#ifndef PACKAGE
+#error This file requires that an autoconf-generated config.h (or equivallent) file be included first.
+#endif
+
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -29,6 +37,12 @@
 #include <sstream>
 #include <functional>
 #include <cstdint>
+
+#ifdef HAVE_EXPAT_H
+#include <expat.h>
+#else
+#error dfxml_reader.h requires expat.h
+#endif
 
 #include "hash_t.h"
 

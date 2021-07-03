@@ -1,12 +1,29 @@
 /* -*- mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*- */
+
 /*
  * Simson's XML output class.
  * Include this AFTER your config file with the HAVE statements.
  * Optimized for DFXML generation.
  */
 
+/*
+ * Revision History:
+ * 2012 - Simson L. Garfinkel - Developed as test program.
+ * 2021 - Cleaned up. Added LGPL copyright notice.
+ *
+ * Copyright (C) 2021 Simson L. Garfinkel.
+ *
+ * LICENSE: LGPL Version 3. See COPYING.md for further information.
+ */
+
+
+
 #ifndef DFXML_WRITER_H
 #define DFXML_WRITER_H
+
+#ifndef PACKAGE
+#error This file requires that an autoconf-generated config.h (or equivallent) file be included first.
+#endif
 
 /* c++ */
 #include <cassert>
@@ -14,6 +31,7 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
+#include <cstdarg>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -23,7 +41,6 @@
 #include <stack>
 #include <string>
 #include <stdexcept>
-#include <stdarg.h>
 
 #include <sys/time.h>
 
@@ -67,6 +84,14 @@
 
 #ifdef HAVE_BOOST_VERSION_HPP
 #include <boost/version.hpp>
+#endif
+
+#ifdef HAVE_PWD_H
+#include <pwd.h>
+#endif
+
+#ifdef UUID_UUID_H
+#include <uuid/uuid.h>
 #endif
 
 #include "cpuid.h"
