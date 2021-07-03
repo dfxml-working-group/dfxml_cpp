@@ -56,7 +56,29 @@ make
 sudo make install
 ```
 
-Note: If you are on a Linux machine ensure, that the packages specified in `src/requirements-ubuntu.txt` are installed. 
+#### Using dfxml as a shared library
+Afterwards, you can compile programs, which use the newly created shared library by specifying `-ldfxml`:
+
+```bash
+# Building the simple demo program using dfxml_reader.h
+g++ dfxml_demo.cpp -ldfxml
+
+# Building a program, which uses dfxml_writer.h
+g++ testapp_catch2.cpp tests/catch.hpp -lcrypto -ldfxml
+```
+Due of the fact, that `dfxml_writer.h` is a header-only-library, its linkage with `-lcrypto` has to be commanded during the compilation of the program, which depends on `dfxml_writer.h`.  
+
+
+The library gets installed in `/usr/local/lib`, while the include-headers are copied to `/usr/local/include`.
+Therfore ensure, that those paths are in `/etc/ld.so.conf` and your include-path, respectively, which can be checked by executing the following commands: 
+
+```bash
+sudo ldconfig -v | grep dfxml
+echo | g++ -E -Wp,-v -
+```
+
+*Note: If you are on a Linux machine ensure, that the packages specified in `src/requirements-ubuntu.txt` are installed.*
+
 
 Release Notes
 =============

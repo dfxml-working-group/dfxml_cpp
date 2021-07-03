@@ -24,7 +24,7 @@
  *      byte_runs but not fs_offset
  */
 
-#include "config.h"
+#include <dfxml_config.h>
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -32,7 +32,7 @@
 #include <set>
 #include <limits>
 
-#include "dfxml_reader.h"
+#include <dfxml_reader.h>
 
 
 /** @brief items of interest from dfxml byte_run data type

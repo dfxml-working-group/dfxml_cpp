@@ -10,10 +10,10 @@ include Makefile.defs
 lib_LTLIBRARIES = libdfxml.la
 libdfxml_la_SOURCES = $(DFXML_WRITER) $(DFXML_READER)
 libdfxml_la_LDFLAGS = -version-info 0:0:0
-include_HEADERS  = dfxml_reader.h dfxml_writer.h
+include_HEADERS  = dfxml_reader.h dfxml_writer.h dfxml_hash_t.h dfxml_config.h dfxml_cpuid.h
 
-# Build demo programs
-bin_PROGRAMS = dfxml_demo iblkfind
+# Build demo programs, but don't install them
+noinst_bin_PROGRAMS = dfxml_demo iblkfind
 dfxml_demo_SOURCES = dfxml_demo.cpp cpuid.h
 dfxml_demo_LDADD = ./libdfxml.la
 

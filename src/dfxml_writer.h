@@ -23,7 +23,7 @@
 #include <stack>
 #include <string>
 #include <stdexcept>
-#include <stdarg.h>
+#include <cstdarg>
 
 #include <sys/time.h>
 
@@ -78,7 +78,7 @@
 #include <boost/version.hpp>
 #endif
 
-#include "cpuid.h"
+#include <dfxml_cpuid.h>
 
 
 class dfxml_writer {

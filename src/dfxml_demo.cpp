@@ -1,5 +1,5 @@
-#include "config.h"
-#include "dfxml_reader.h"
+#include <dfxml_config.h>
+#include <dfxml_reader.h>
 
 
 /*

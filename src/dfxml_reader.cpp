@@ -6,8 +6,8 @@
  * This file is public domain.
  */
 
-#include "config.h"
-#include "dfxml_reader.h"
+#include <dfxml_config.h>
+#include <dfxml_reader.h>
 
 #include <algorithm>
 #include <fstream>

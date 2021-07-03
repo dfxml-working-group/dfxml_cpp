@@ -14,7 +14,7 @@ AC_CONFIG_MACRO_DIR(m4)
 m4_include([m4/ax_cxx_compile_stdcxx.m4])
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([dfxml_config.h])
 AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 

@@ -1,10 +1,10 @@
 #define CATCH_CONFIG_MAIN
-#include "config.h"
+#include <dfxml_config.h>
 #include "tests/catch.hpp"
 
-#include "hash_t.h"
-#include "dfxml_writer.h"
-#include "cpuid.h"
+#include <dfxml_hash_t.h>
+#include <dfxml_writer.h>
+#include <dfxml_cpuid.h>
 
 const uint8_t nulls[512] = {0};
 
