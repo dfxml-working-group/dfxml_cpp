@@ -45,7 +45,7 @@ jobs:
       - name: Run C++ checks
         run: |
           make check
-          make distcheck
+      
 
       - name: Run codecov on the C++
         if: startsWith(matrix.os, 'ubuntu')
