@@ -1,12 +1,18 @@
 #                                               -*- Autoconf -*-
-# Process this file with autoconf to produce a configure script.
-# Order is largely irrelevant, although it must start with AC_INIT and end with AC_OUTPUT
-# See http://autotoolset.sourceforge.net/tutorial.html
-# and http://www.openismus.com/documents/linux/automake/automake.shtml
+#
+# This configure script is for creating dfxml_config.h, which is used for the
+# config file used by the unittest (testapp_catch2.cpp) program.
+#
 
+# LICENSE
 #
-# This file is public domain
+# Copyright (c) 2021, Simson L. Garfinkel <simsong@acm.org>
 #
+#   Copying and distribution of this file, with or without modification, are
+#   permitted in any medium without royalty provided the copyright notice
+#   and this notice are preserved.  This file is offered as-is, without any
+#   warranty.
+
 
 AC_PREREQ([2.69])
 AC_INIT([DFXML],[1.0.1],[bugs@digitalcorpora.org])
@@ -14,7 +20,7 @@ AC_CONFIG_MACRO_DIR(m4)
 m4_include([m4/ax_cxx_compile_stdcxx.m4])
 
 AC_CONFIG_FILES([Makefile])
-AC_CONFIG_HEADERS([config.h])
+AC_CONFIG_HEADERS([dfxml_config.h])
 AM_INIT_AUTOMAKE([foreign])
 AM_MAINTAINER_MODE
 
@@ -36,20 +42,6 @@ AX_CXX_COMPILE_STDCXX([17], [noext], [mandatory])
 AC_LANG_POP()
 
 m4_include([dfxml_configure.m4])
-
-
-################################################################
-## Expat
-## Required for S3 and Digital Signatures
-##
-AC_ARG_WITH(expat,
-  AS_HELP_STRING([--with-expat=PATH], [where libexpat is compiled (if it isn't installed); required for S3 and Digital Signatures]),
-  [LDFLAGS="-L${with_expat} $LDFLAGS" ;
-   CPPFLAGS="-I${with_expat}/lib $CPPFLAGS"])
-
-have_expat=yes
-AC_CHECK_HEADER([expat.h])
-AC_CHECK_LIB([expat],[XML_ParserCreate],,[have_expat="no ";AC_MSG_WARN([expat not found; S3 and Digital Signatures not enabled])])
 
 ################################################################
 #
