@@ -4,7 +4,7 @@
 # 2020-06-27 - slg - expanded to G++ for MacOS
 #
 name: CI (c++)
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -38,17 +38,14 @@ jobs:
           bash bootstrap.sh
           ./configure
           make
+
+      - name: GCC Problem Matcher
+        uses: ammaraskar/gcc-problem-matcher@0.1
+
       - name: Run C++ checks
         run: |
           make check
           make distcheck
-
-      - name: Cleanup
-        run: |
-          make distclean
-
-      - name: GCC Problem Matcher
-        uses: ammaraskar/gcc-problem-matcher@0.1
 
       - name: Run codecov on the C++
         if: startsWith(matrix.os, 'ubuntu')
@@ -60,4 +57,8 @@ jobs:
           make check
           gcov-9 -n -o . *cpp
           bash <(curl -s https://codecov.io/bash)
+          make distclean
+
+      - name: Cleanup
+        run: |
           make distclean
