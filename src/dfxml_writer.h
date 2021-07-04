@@ -127,7 +127,7 @@ public:
         t0(),t_last_timestamp(),make_dtd(false),outfilename(outfilename_),oneline() {
         gettimeofday(&t0,0);
         gettimeofday(&t_last_timestamp,0);
-        if(!outf.is_open()){
+        if (!outf.is_open()){
             perror(outfilename_.c_str());
             exit(1);
         }
@@ -162,7 +162,7 @@ public:
 private:
     std::mutex     M;
     std::fstream   outf;
-    std::ostream   *out;                  // where it is being written; defaults to stdout
+    std::ostream   *out;                 // where it is being written; defaults to stdout
     stringset_t    tags;                 // XML tags
     std::stack<std::string>tag_stack;
     std::string    tempfilename;
@@ -171,7 +171,7 @@ private:
     struct timeval t_last_timestamp;	// for creating delta timestamps
     bool           make_dtd;
     std::string    outfilename;
-    bool           oneline;             // output entire DFXML on a single line
+    bool           oneline;             // output entire DFXML on a single line. Can be toggled on and off
 
     void  write_doctype(std::fstream &out);
     void  write_dtd() {
@@ -189,15 +189,15 @@ private:
      * make sure that a tag is valid and, if so, add it to the list of tags we use
      */
     void  verify_tag(std::string tag) {
-        if(tag[0]=='/') tag = tag.substr(1);
-        if(tag.find(" ") != std::string::npos){
+        if (tag[0]=='/') tag = tag.substr(1);
+        if (tag.find(" ") != std::string::npos){
             std::cerr << "tag '" << tag << "' contains space. Cannot continue.\n";
             exit(1);
         }
         tags.insert(tag);
     }
-    void  spaces(){   // print spaces corresponding to tag stack
-        for(unsigned int i=0;i<tag_stack.size() && !oneline;i++){
+    void  spaces(int delta=0){   // print spaces corresponding to tag stack
+        for(unsigned int i=0;i<tag_stack.size()+delta && !oneline;i++){
             *out << "  ";
         }
     }
@@ -208,7 +208,7 @@ public:
         std::string command_line;
         for(int i=0;i<argc;i++){
             // append space separator between arguments
-            if(i>0) command_line.push_back(' ');
+            if (i>0) command_line.push_back(' ');
             if (strchr(argv[i],' ') != NULL) {
                 // the argument has a space, so quote the argument
                 command_line.append("\"");
@@ -280,7 +280,7 @@ public:
     static std::string xmlstrip(const std::string &xml) {
         std::string ret;
         for( const auto &ch : xml){
-            if(isprint(ch) && !strchr("<>\r\n&'\"",ch)){
+            if (isprint(ch) && !strchr("<>\r\n&'\"",ch)){
                 ret += isspace(ch) ? '_' : tolower(ch);
             }
         }
@@ -291,7 +291,7 @@ public:
     static std::string xmlmap(const strstrmap_t &m,const std::string &outer,const std::string &attrs) {
         std::stringstream ss;
         ss << "<" << outer;
-        if(attrs.size()>0) ss << " " << attrs;
+        if (attrs.size()>0) ss << " " << attrs;
         ss << ">";
         for(std::map<std::string,std::string>::const_iterator it=m.begin();it!=m.end();it++){
             ss << "<" << (*it).first  << ">" << xmlescape((*it).second) << "</" << (*it).first << ">";
@@ -312,19 +312,19 @@ public:
             throw std::runtime_error("dfxml: tag stack not empty.");
         }
         outf.close();
-        if(make_dtd){
+        if (make_dtd){
             /* If we are making the DTD, then we should close the file,
              * scan the output file for the tags, write to a temp file, and then
              * close the temp file and have it overwrite the outfile.
              */
 
             std::ifstream in( tempfilename.c_str());
-            if(!in.is_open()){
+            if (!in.is_open()){
                 std::cerr << tempfilename << strerror(errno) << ":Cannot re-open for input\n";
                 exit(1);
             }
             outf.open( outfilename.c_str(),std::ios_base::out);
-            if(!outf.is_open()){
+            if (!outf.is_open()){
                 std::cerr << outfilename << " " << strerror(errno)
                           << ": Cannot open for output; will not delete " << tempfilename << "\n";
                 exit(1);
@@ -349,14 +349,14 @@ public:
     void tagout( const std::string &tag, const std::string &attribute) {
         verify_tag(tag);
         *out << "<" << tag;
-        if(attribute.size()>0) *out << " " << attribute;
+        if (attribute.size()>0) *out << " " << attribute;
         *out << ">";
     }
     void push( const std::string &tag, const std::string &attribute) {
         spaces();
         tag_stack.push(tag);
         tagout(tag,attribute);
-        if(!oneline) *out << '\n';
+        if (!oneline) *out << '\n';
     }
     void push( const std::string &tag) {push(tag,"");}
 
@@ -372,7 +372,7 @@ public:
 
         /** printf to stream **/
         char *ret = 0;
-        if(vasprintf(&ret,fmt,ap) < 0){
+        if (vasprintf(&ret,fmt,ap) < 0){
             *out << "dfxml_writer::xmlprintf: " << strerror(errno);
             exit(EXIT_FAILURE);
         }
@@ -383,13 +383,26 @@ public:
         va_end(ap);
     }
 
-    void pop() { // close the tag
-        assert(tag_stack.size()>0);
+    // pop the current tag off the stack.
+    //
+    // If an optional tag is provided, validate that it is at the top
+    // of the stack
+    void pop(std::string close_tag="") {
+        if (tag_stack.size()==0){
+            std::cerr << "dfxml_writer::pop(" << close_tag << "): stack empty\n";
+            throw std::runtime_error("dfxml: stack empty.");
+        }
         std::string tag = tag_stack.top();
-        spaces();
+        if (close_tag!="" && tag!=close_tag) {
+            std::cerr << "dfxml_writer::pop: provided tag '" << close_tag
+                      << "' does not match top of stack '" << tag << "'\n";
+            throw std::runtime_error("dfxml: stack inconsistent.");
+        }
+
+        spaces(-1);
         tagout("/"+tag,"");
-        *out << '\n';
         tag_stack.pop();
+        if (oneline==false) *out << '\n';
     }
 
     void add_timestamp(const std::string &name) {
@@ -398,7 +411,7 @@ public:
         // timestamp delta against t_last_timestamp
         gettimeofday(&t1,0);
         t.tv_sec = t1.tv_sec - t_last_timestamp.tv_sec;
-        if(t1.tv_usec > t_last_timestamp.tv_usec){
+        if (t1.tv_usec > t_last_timestamp.tv_usec){
             t.tv_usec = t1.tv_usec - t_last_timestamp.tv_usec;
         } else {
             t.tv_sec--;
@@ -412,7 +425,7 @@ public:
 
         // timestamp total
         t.tv_sec = t1.tv_sec - t0.tv_sec;
-        if(t1.tv_usec > t0.tv_usec){
+        if (t1.tv_usec > t0.tv_usec){
             t.tv_usec = t1.tv_usec - t0.tv_usec;
         } else {
             t.tv_sec--;
@@ -451,7 +464,7 @@ public:
         xmlout("LIBS",LIBS,"",true);
 #endif
 #if defined(__DATE__) && defined(__TIME__) && defined(HAVE_STRPTIME)
-        if(strptime(__DATE__,"%b %d %Y",&tm)){
+        if (strptime(__DATE__,"%b %d %Y",&tm)){
             char buf[64];
             snprintf(buf,sizeof(buf),"%4d-%02d-%02dT%s",tm.tm_year+1900,tm.tm_mon+1,tm.tm_mday,__TIME__);
             xmlout("compilation_date",buf);
@@ -496,7 +509,7 @@ public:
 
 #ifdef HAVE_SYS_UTSNAME_H
         struct utsname name;
-        if(uname(&name)==0){
+        if (uname(&name)==0){
             xmlout("os_sysname",name.sysname);
             xmlout("os_release",name.release);
             xmlout("os_version",name.version);
@@ -510,7 +523,7 @@ public:
 #ifdef HAVE_GETHOSTNAME
         {
             char hostname[1024];
-            if(gethostname(hostname,sizeof(hostname))==0){
+            if (gethostname(hostname,sizeof(hostname))==0){
                 xmlout("host",hostname);
             }
         }
@@ -567,7 +580,7 @@ public:
 #ifdef HAVE_GETRUSAGE
         struct rusage ru;
         memset(&ru,0,sizeof(ru));
-        if(getrusage(RUSAGE_SELF,&ru)==0){
+        if (getrusage(RUSAGE_SELF,&ru)==0){
             push("rusage");
             xmlout("utime",ru.ru_utime);
             xmlout("stime",ru.ru_stime);
@@ -583,7 +596,7 @@ public:
             struct timeval t;
 
             t.tv_sec = t1.tv_sec - t0.tv_sec;
-            if(t1.tv_usec > t0.tv_usec){
+            if (t1.tv_usec > t0.tv_usec){
                 t.tv_usec = t1.tv_usec - t0.tv_usec;
             } else {
                 t.tv_sec--;
@@ -613,7 +626,7 @@ public:
 
         /** printf to stream **/
         char *ret = 0;
-        if(vasprintf(&ret,fmt,ap) < 0){
+        if (vasprintf(&ret,fmt,ap) < 0){
             std::cerr << "dfxml_writer::xmlprintf: " << strerror(errno) << "\n";
             exit(EXIT_FAILURE);
         }
@@ -629,14 +642,14 @@ public:
     void xmlout( const std::string &tag,const std::string &value, const std::string &attribute, const bool escape_value) {
         const std::lock_guard<std::mutex> lock(M);
         spaces();
-        if(value.size()==0){
-            if(tag.size()) tagout(tag,attribute+"/");
+        if (value.size()==0){
+            if (tag.size()) tagout(tag,attribute+"/");
         } else {
-            if(tag.size()) tagout(tag,attribute);
+            if (tag.size()) tagout(tag,attribute);
             *out << (escape_value ? xmlescape(value) : value);
-            if(tag.size()) tagout("/"+tag,"");
+            if (tag.size()) tagout("/"+tag,"");
         }
-        *out << "\n";
+        if (oneline==false) *out << "\n";
         out->flush();
     }
 
@@ -665,11 +678,11 @@ public:
         time_t t = ts.tv_sec;
         struct tm *tmp;
         tmp = gmtime(&t);
-        if(!tmp) return std::string("INVALID");
+        if (!tmp) return std::string("INVALID");
         tm = *tmp;
 #endif
         strftime(buf,sizeof(buf),"%Y-%m-%dT%H:%M:%S",&tm);
-        if(ts.tv_usec>0){
+        if (ts.tv_usec>0){
             int len = strlen(buf);
             snprintf(buf+len,sizeof(buf)-len,".%06d",(int)ts.tv_usec);
         }
