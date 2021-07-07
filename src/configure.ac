@@ -5,7 +5,7 @@
 # That is the sole purpose of this script.
 #
 # It includes dfxml_configure.mx, which is a mix-in for using dfxml
-
+#
 # LICENSE
 #
 # Copyright (c) 2021, Simson L. Garfinkel <simsong@acm.org>
@@ -14,6 +14,8 @@
 #   permitted in any medium without royalty provided the copyright notice
 #   and this notice are preserved.  This file is offered as-is, without any
 #   warranty.
+#
+# See COPYING.md for complete CC0 1.0 / LGPL Fusion Universal Summary license.
 
 
 AC_PREREQ([2.69])
