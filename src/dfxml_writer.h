@@ -122,7 +122,7 @@ public:
     }
 
 // write to a file, optionally making a DTD
-    dfxml_writer(const std::string &outfilename_,bool makeDTD):
+    dfxml_writer(const std::string &outfilename_, bool makeDTD):
         M(),outf(outfilename_.c_str(),std::ios_base::out), out(),tags(),tag_stack(),tempfilename(),tempfile_template(outfilename_+"_tmp_XXXXXXXX"),
         t0(),t_last_timestamp(),make_dtd(false),outfilename(outfilename_),oneline() {
         gettimeofday(&t0,0);
@@ -355,7 +355,7 @@ public:
     void push( const std::string &tag, const std::string &attribute) {
         spaces();
         tag_stack.push(tag);
-        tagout(tag,attribute);
+        tagout(tag, attribute);
         if (!oneline) *out << '\n';
     }
     void push( const std::string &tag) {push(tag,"");}
@@ -620,7 +620,7 @@ public:
         // "4" because this is "1";
         const std::lock_guard<std::mutex> lock(M);
         spaces();
-        tagout(tag,attribute);
+        tagout(tag, attribute);
         va_list ap;
         va_start(ap, fmt);
 
