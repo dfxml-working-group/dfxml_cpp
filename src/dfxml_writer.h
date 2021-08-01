@@ -402,7 +402,7 @@ public:
         spaces(-1);
         tagout("/"+tag,"");
         tag_stack.pop();
-        if (oneline==false) *out << '\n';
+        if (!oneline) *out << '\n';
     }
 
     void add_timestamp(const std::string &name) {
@@ -546,10 +546,13 @@ public:
         pop();                      // <execution_environment>
     }
     void set_oneline(bool v) {
+        const std::lock_guard<std::mutex> lock(M);
+        if(v==oneline) return;          // nothing to do
         if (v){
             spaces();
         } else {
             *out << "\n";
+            std::cerr << "turning off oneline\n";
         }
         oneline = v;
     }
@@ -611,6 +614,7 @@ public:
     /***************************************
      *** ALL THAT FOLLOWS ARE THREADSAFE ***
      ***************************************/
+    /* Ignores oneline */
     void comment(const std::string &comment) {
         const std::lock_guard<std::mutex> lock(M);
         *out << "<!-- " << comment << " -->\n";
@@ -636,9 +640,10 @@ public:
 
         va_end(ap);
         tagout("/"+tag,"");
-        *out << '\n';
+        if (!oneline) *out << '\n';
         out->flush();
     }
+    /* All of the xmlout( calls eventually end up here. */
     void xmlout( const std::string &tag,const std::string &value, const std::string &attribute, const bool escape_value) {
         const std::lock_guard<std::mutex> lock(M);
         spaces();
@@ -649,7 +654,7 @@ public:
             *out << (escape_value ? xmlescape(value) : value);
             if (tag.size()) tagout("/"+tag,"");
         }
-        if (oneline==false) *out << "\n";
+        if (!oneline) *out << "\n";
         out->flush();
     }
 
