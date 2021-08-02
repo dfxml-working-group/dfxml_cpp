@@ -161,9 +161,9 @@ public:
 
 private:
     std::mutex     M;
-    std::fstream   outf;
-    std::ostream   *out;                 // where it is being written; defaults to stdout
-    stringset_t    tags;                 // XML tags
+    std::fstream   outf;             // if we are writing to a file...
+    std::ostream   *out;             // where it is being written; defaults to stdout
+    stringset_t    tags;             // XML tags
     std::stack<std::string>tag_stack;
     std::string    tempfilename;
     std::string    tempfile_template;
@@ -552,7 +552,6 @@ public:
             spaces();
         } else {
             *out << "\n";
-            std::cerr << "turning off oneline\n";
         }
         oneline = v;
     }
