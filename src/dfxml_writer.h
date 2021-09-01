@@ -256,35 +256,35 @@ public:
         tempfile_template = temp;
     }
     static std::string xmlescape(const std::string &xml) {
-        std::string ret;
-        for(auto const &ch: xml){
+        std::stringstream ret;
+        for(char ch: xml){
             switch(ch){
                 // XML escapes
-            case '>':  ret += xml_gt; break;
-            case '<':  ret += xml_lt; break;
-            case '&':  ret += xml_am; break;
-            case '\'': ret += xml_ap; break;
-            case '"':  ret += xml_qu; break;
+            case '>':  ret << xml_gt; break;
+            case '<':  ret << xml_lt; break;
+            case '&':  ret << xml_am; break;
+            case '\'': ret << xml_ap; break;
+            case '"':  ret << xml_qu; break;
 
                 // % encodings
-            case '\000':  ret += encoding_null; break;      // retain encoded nulls
-            case '\r':  ret += encoding_r; break;
-            case '\n':  ret += encoding_n; break;
-            case '\t':  ret += encoding_t; break;
+            case '\000':  ret << encoding_null; break;      // retain encoded nulls
+            case '\r':  ret << encoding_r; break;
+            case '\n':  ret << encoding_n; break;
+            case '\t':  ret << encoding_t; break;
             default:
-                ret += ch;
+                ret << ch;
             }
         }
-        return ret;
+        return ret.str();
     }
     static std::string xmlstrip(const std::string &xml) {
-        std::string ret;
-        for( const auto &ch : xml){
+        std::stringstream ret;
+        for( char ch : xml){
             if (isprint(ch) && !strchr("<>\r\n&'\"",ch)){
-                ret += isspace(ch) ? '_' : tolower(ch);
+                ret << isspace(ch) ? '_' : tolower(ch);
             }
         }
-        return ret;
+        return ret.str();
     }
 
     /** xmlmap turns a map into an XML block */
