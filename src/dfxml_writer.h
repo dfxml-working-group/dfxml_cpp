@@ -281,7 +281,7 @@ public:
         std::stringstream ret;
         for( char ch : xml){
             if (isprint(ch) && !strchr("<>\r\n&'\"",ch)){
-                ret << isspace(ch) ? '_' : tolower(ch);
+                ret << (isspace(ch) ? '_' : tolower(ch));
             }
         }
         return ret.str();
