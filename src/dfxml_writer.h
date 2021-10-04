@@ -371,13 +371,21 @@ public:
         va_start(ap, fmt);
 
         /** printf to stream **/
+#if defined(HAVE_VASPRINTF) && !defined(__MINGW32__)
         char *ret = 0;
         if (vasprintf(&ret,fmt,ap) < 0){
-            *out << "dfxml_writer::xmlprintf: " << strerror(errno);
-            exit(EXIT_FAILURE);
+            throw std::runtime_error("dfxml_writer::xmlprintf");
         }
         *out << ret;
         free(ret);
+#else
+        char buf[65536];                // hope this is big enough
+        if (vsnprintf(buf, sizeof(buf), fmt, ap) < 0 ){
+            throw std::runtime_error("dfxml_writer::xmlprintf");
+        }
+        *out << buf;
+#endif
+
         /** end printf to stream **/
 
         va_end(ap);
@@ -628,13 +636,20 @@ public:
         va_start(ap, fmt);
 
         /** printf to stream **/
+#if defined(HAVE_VASPRINTF) && !defined(__MINGW32__)
         char *ret = 0;
         if (vasprintf(&ret,fmt,ap) < 0){
-            std::cerr << "dfxml_writer::xmlprintf: " << strerror(errno) << "\n";
-            exit(EXIT_FAILURE);
+            throw std::runtime_error("dfxml_writer::xmlprintf ");
         }
         *out << ret;
         free(ret);
+#else
+        char buf[65536];
+        if (vsnprintf(buf, sizeof(buf), fmt, ap) < 0){
+            throw std::runtime_error("dfxml_writer::xmlprintf");
+        }
+        *out << buf;
+#endif
         /** end printf to stream **/
 
         va_end(ap);
@@ -659,16 +674,30 @@ public:
 
     /* These all call xmlout or xmlprintf which already has locking, so these are all threadsafe! */
     void xmlout( const std::string &tag,const std::string &value )       { xmlout(tag,value,"",true); }
+#ifndef __MINGW32__
     void xmlout( const std::string &tag,const signed char value )        { xmlprintf(tag,"","%hhd",value); }
+#endif
     void xmlout( const std::string &tag,const short value )              { xmlprintf(tag,"","%hd", value); }
     void xmlout( const std::string &tag,const int value )                { xmlprintf(tag,"","%d",  value); }
     void xmlout( const std::string &tag,const long value )               { xmlprintf(tag,"","%ld", value); }
+#ifndef __MINGW32__
     void xmlout( const std::string &tag,const long long value )          { xmlprintf(tag,"","%lld",value); }
+#else
+    void xmlout( const std::string &tag,const long long value )          { xmlprintf(tag,"","%I64d",value); }
+#endif
+#ifndef __MINGW32__
     void xmlout( const std::string &tag,const unsigned char value )      { xmlprintf(tag,"","%hhu",value); }
+#else
+    void xmlout( const std::string &tag,const unsigned char value )      { xmlprintf(tag,"","%hu",value); }
+#endif
     void xmlout( const std::string &tag,const unsigned short value )     { xmlprintf(tag,"","%hu", value); }
     void xmlout( const std::string &tag,const unsigned int value )       { xmlprintf(tag,"","%u",  value); }
     void xmlout( const std::string &tag,const unsigned long value )      { xmlprintf(tag,"","%lu", value); }
+#ifndef __MINGW32__
     void xmlout( const std::string &tag,const unsigned long long value ) { xmlprintf(tag,"","%llu",value); }
+#else
+    void xmlout( const std::string &tag,const unsigned long long value ) { xmlprintf(tag,"","%I64u",value); }
+#endif
     void xmlout( const std::string &tag,const double value )             { xmlprintf(tag,"","%f",value); }
     void xmlout( const std::string &tag,const struct timeval &ts) {
         xmlprintf(tag,"","%d.%06d",(int)ts.tv_sec, (int)ts.tv_usec);
