@@ -19,3 +19,5 @@ libtool
 dfxml_config.h
 dfxml_config.h.in
 *.la
+*.d
+*.exe

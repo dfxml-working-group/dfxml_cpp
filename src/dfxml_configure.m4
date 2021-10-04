@@ -39,10 +39,15 @@ if test "$have_cpuid" = yes; then
 fi
 
 ################################################################
-## on Win32, crypto requires zlib
+## On Win32, crypto requires zlib.
+## On Win32, dfxml_writer requires GetProcessMemoryInfo, which requires psapi
 case $host in
   *mingw32*)
-  AC_CHECK_LIB([z], [gzdopen],[LIBS="-lz $LIBS"], [AC_MSG_ERROR([Could not find zlib library])])
+  AC_CHECK_LIB([z], [gzdopen], [LIBS="-lz $LIBS"], [AC_MSG_ERROR([Could not find zlib library])])
+  AC_MSG_NOTICE([Adding -lpsapi])
+  LIBS="-lpsapi $LIBS"
+  CFLAGS="-static-libgcc $CFLAGS"
+  CXXFLAGS="-static-libstdc++ $CXXFLAGS"
 esac
 
 ################################################################
@@ -54,6 +59,7 @@ AC_CHECK_HEADERS([CommonCrypto/CommonDigest.h])
 
 ## gcrypt
 AC_CHECK_HEADERS([gcrypt.h])
+AC_CHECK_LIB([gpg-error],[gpg_strerror])
 AC_CHECK_LIB([gcrypt],[gcry_md_open])
 
 ## OpenSSL Note that this works with both OpenSSL 1.0 and OpenSSL 1.1
