@@ -39,10 +39,15 @@ if test "$have_cpuid" = yes; then
 fi
 
 ################################################################
-## on Win32, crypto requires zlib
+## On Win32, crypto requires zlib.
+## On Win32, dfxml_writer requires GetProcessMemoryInfo, which requires psapi
 case $host in
   *mingw32*)
-  AC_CHECK_LIB([z], [gzdopen],[LIBS="-lz $LIBS"], [AC_MSG_ERROR([Could not find zlib library])])
+  AC_CHECK_LIB([z], [gzdopen], [LIBS="-lz $LIBS"], [AC_MSG_ERROR([Could not find zlib library])])
+  AC_MSG_NOTICE([Adding -lpsapi])
+  LIBS="-lpsapi $LIBS"
+  CFLAGS="-static-libgcc $CFLAGS"
+  CXXFLAGS="-static-libstdc++ $CXXFLAGS"
 esac
 
 ################################################################
@@ -52,11 +57,13 @@ esac
 ## MacOS CommonCrypto
 AC_CHECK_HEADERS([CommonCrypto/CommonDigest.h])
 
-## OpenSSL Support is now required (for hash_t)
-## Note that this now works with both OpenSSL 1.0 and OpenSSL 1.1
-## On OpenSSL man page we can read:
+## gcrypt
+AC_CHECK_HEADERS([gcrypt.h])
+AC_CHECK_LIB([gpg-error],[gpg_strerror])
+AC_CHECK_LIB([gcrypt],[gcry_md_open])
+
+## OpenSSL Note that this works with both OpenSSL 1.0 and OpenSSL 1.1
 ## EVP_MD_CTX_create() and EVP_MD_CTX_destroy() were renamed to EVP_MD_CTX_new() and EVP_MD_CTX_free() in OpenSSL 1.1.
-## So we need to check for all of them.
 AC_CHECK_HEADERS([openssl/aes.h openssl/bio.h openssl/evp.h openssl/hmac.h openssl/md5.h openssl/pem.h openssl/rand.h openssl/rsa.h openssl/sha.h openssl/pem.h openssl/x509.h])
 
 # OpenSSL has been installed under at least two different names...
@@ -64,8 +71,19 @@ AC_CHECK_LIB([crypto],[EVP_get_digestbyname])
 AC_CHECK_LIB([ssl],[SSL_library_init])
 
 ## Make sure we have some kind of crypto
-AC_CHECK_FUNCS([CC_MD2_Init],
-        AC_MSG_NOTICE([Apple CommonCrypto Detected]),
-        AC_CHECK_FUNCS([EVP_get_digestbyname],,AC_MSG_ERROR([CommonCrypto or SSL/OpenSSL support required]))
-        AC_CHECK_FUNCS([EVP_MD_CTX_new EVP_MD_CTX_free])
-)
+have_crypto=NO
+AC_CHECK_FUNC([gcry_md_open],          [AC_DEFINE([HAVE_GCRYPT], [1], [Define if GNU CRYPT detected])
+                                       have_crypto=YES])
+if test "$have_crypto" = NO; then
+    AC_CHECK_FUNC([CC_MD2_Init],           [AC_DEFINE([HAVE_COMMONCRYPTO], [1], [Define if Apple CommonCrypto Detected])
+                                          have_crypto=YES])
+fi
+if test "$have_crypto" = NO; then
+    AC_CHECK_FUNC([EVP_get_digestbyname],  [AC_DEFINE([HAVE_OPENSSL], [1], [Define if OpenSSL detected])
+                                       have_crypto=YES])
+fi
+
+if test "$have_crypto" = NO; then
+    echo foo
+    AC_MSG_ERROR([CommonCrypto, SSL/OpenSSL, or gcrypt support required])
+fi

@@ -33,6 +33,7 @@
 #include <ctime>
 #include <cstdarg>
 #include <fstream>
+#include <filesystem>
 #include <iostream>
 #include <map>
 #include <mutex>
@@ -50,13 +51,14 @@
 # include <io.h>
 #endif
 
-#ifdef WIN32
-#include <psapi.h>
-#endif
-
+#ifdef _WIN32
 #ifdef HAVE_WINSOCK2_H
 #include <winsock2.h>
 #endif
+#include <windows.h>
+#include <psapi.h>
+#endif
+
 
 // Unix/Linux Specific
 
@@ -104,13 +106,12 @@ public:
     static inline std::string xml_ap = "&apos;";
     static inline std::string xml_qu = "&quot;";
 
-// % encodings
+    // % encodings
     static inline std::string encoding_null = "%00";
     static inline std::string encoding_r = "%0D";
     static inline std::string encoding_n = "%0A";
     static inline std::string encoding_t = "%09";
     static inline std::string const xml_header = "<?xml version='1.0' encoding='UTF-8'?>\n";
-
 
     /* This is the main interface: */
     // defaults to stdout
@@ -121,16 +122,16 @@ public:
         *out << xml_header;
     }
 
-// write to a file, optionally making a DTD
-    dfxml_writer(const std::string &outfilename_, bool makeDTD):
-        M(),outf(outfilename_.c_str(),std::ios_base::out), out(),tags(),tag_stack(),tempfilename(),tempfile_template(outfilename_+"_tmp_XXXXXXXX"),
+    // write to a file, optionally making a DTD
+    dfxml_writer(const std::filesystem::path &outfilename_, bool makeDTD):
+        M(),outf(outfilename_.c_str(),std::ios_base::out), out(),tags(),tag_stack(),tempfilename(),
+        tempfile_template( outfilename_.string()+"_tmp_XXXXXXXX"),
         t0(),t_last_timestamp(),make_dtd(false),outfilename(outfilename_),oneline() {
+        if (!outf.is_open()){
+            throw std::runtime_error(outfilename_.string());
+        }
         gettimeofday(&t0,0);
         gettimeofday(&t_last_timestamp,0);
-        if (!outf.is_open()){
-            perror(outfilename_.c_str());
-            exit(1);
-        }
         out = &outf;                                                // use this one instead
         *out << xml_header;
     }
@@ -170,7 +171,7 @@ private:
     struct timeval t0;
     struct timeval t_last_timestamp;	// for creating delta timestamps
     bool           make_dtd;
-    std::string    outfilename;
+    std::filesystem::path    outfilename;
     bool           oneline;             // output entire DFXML on a single line. Can be toggled on and off
 
     void  write_doctype(std::fstream &out);
@@ -371,13 +372,21 @@ public:
         va_start(ap, fmt);
 
         /** printf to stream **/
+#if defined(HAVE_VASPRINTF) && !defined(__MINGW32__)
         char *ret = 0;
         if (vasprintf(&ret,fmt,ap) < 0){
-            *out << "dfxml_writer::xmlprintf: " << strerror(errno);
-            exit(EXIT_FAILURE);
+            throw std::runtime_error("dfxml_writer::xmlprintf");
         }
         *out << ret;
         free(ret);
+#else
+        char buf[65536];                // hope this is big enough
+        if (vsnprintf(buf, sizeof(buf), fmt, ap) < 0 ){
+            throw std::runtime_error("dfxml_writer::xmlprintf");
+        }
+        *out << buf;
+#endif
+
         /** end printf to stream **/
 
         va_end(ap);
@@ -556,13 +565,13 @@ public:
         oneline = v;
     }
 
-    const std::string &get_outfilename() const {return outfilename; } ;
+    const std::filesystem::path &get_outfilename() const {return outfilename; } ;
 
     /********************************
      *** THESE ARE ALL THREADSAFE ***
      ********************************/
     void add_rusage() {
-#ifdef WIN32
+#ifdef _WIN32
         /* Note: must link -lpsapi for this */
         PROCESS_MEMORY_COUNTERS_EX pmc;
         memset(&pmc,0,sizeof(pmc));
@@ -628,13 +637,20 @@ public:
         va_start(ap, fmt);
 
         /** printf to stream **/
+#if defined(HAVE_VASPRINTF) && !defined(__MINGW32__)
         char *ret = 0;
         if (vasprintf(&ret,fmt,ap) < 0){
-            std::cerr << "dfxml_writer::xmlprintf: " << strerror(errno) << "\n";
-            exit(EXIT_FAILURE);
+            throw std::runtime_error("dfxml_writer::xmlprintf ");
         }
         *out << ret;
         free(ret);
+#else
+        char buf[65536];
+        if (vsnprintf(buf, sizeof(buf), fmt, ap) < 0){
+            throw std::runtime_error("dfxml_writer::xmlprintf");
+        }
+        *out << buf;
+#endif
         /** end printf to stream **/
 
         va_end(ap);
@@ -659,16 +675,32 @@ public:
 
     /* These all call xmlout or xmlprintf which already has locking, so these are all threadsafe! */
     void xmlout( const std::string &tag,const std::string &value )       { xmlout(tag,value,"",true); }
+    void xmlout( const std::string &tag,const char *value )              { xmlout(tag,std::string(value),"",true); }
+    void xmlout( const std::string &tag,const std::filesystem::path &value) { xmlout(tag, value.string(), "", true); }
+#ifndef __MINGW32__
     void xmlout( const std::string &tag,const signed char value )        { xmlprintf(tag,"","%hhd",value); }
+#endif
     void xmlout( const std::string &tag,const short value )              { xmlprintf(tag,"","%hd", value); }
     void xmlout( const std::string &tag,const int value )                { xmlprintf(tag,"","%d",  value); }
     void xmlout( const std::string &tag,const long value )               { xmlprintf(tag,"","%ld", value); }
+#ifndef __MINGW32__
     void xmlout( const std::string &tag,const long long value )          { xmlprintf(tag,"","%lld",value); }
+#else
+    void xmlout( const std::string &tag,const long long value )          { xmlprintf(tag,"","%I64d",value); }
+#endif
+#ifndef __MINGW32__
     void xmlout( const std::string &tag,const unsigned char value )      { xmlprintf(tag,"","%hhu",value); }
+#else
+    void xmlout( const std::string &tag,const unsigned char value )      { xmlprintf(tag,"","%hu",value); }
+#endif
     void xmlout( const std::string &tag,const unsigned short value )     { xmlprintf(tag,"","%hu", value); }
     void xmlout( const std::string &tag,const unsigned int value )       { xmlprintf(tag,"","%u",  value); }
     void xmlout( const std::string &tag,const unsigned long value )      { xmlprintf(tag,"","%lu", value); }
+#ifndef __MINGW32__
     void xmlout( const std::string &tag,const unsigned long long value ) { xmlprintf(tag,"","%llu",value); }
+#else
+    void xmlout( const std::string &tag,const unsigned long long value ) { xmlprintf(tag,"","%I64u",value); }
+#endif
     void xmlout( const std::string &tag,const double value )             { xmlprintf(tag,"","%f",value); }
     void xmlout( const std::string &tag,const struct timeval &ts) {
         xmlprintf(tag,"","%d.%06d",(int)ts.tv_sec, (int)ts.tv_usec);

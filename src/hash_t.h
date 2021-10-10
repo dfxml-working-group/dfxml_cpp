@@ -47,16 +47,24 @@
 #include <cassert>
 #include <iostream>
 
-#if defined(HAVE_COMMONCRYPTO_COMMONDIGEST_H)
+#if defined(HAVE_GCRYPT) && defined(HAVE_GCRYPT_H)
+#include <gcrypt.h>
+#define USE_GCRYPT
+#define HASH_IMPLEMENTATION_NAME "gcrypt"
+#define HAVE_SHA512_T
+#elif defined(HAVE_COMMONCRYPTO_COMMONDIGEST_H)
 // We are going to ignore -Wdeprecated-declarations, because we need MD5
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #include <CommonCrypto/CommonDigest.h>
 #define USE_COMMON_CRYPTO
+#define HASH_IMPLEMENTATION_NAME "CommonCrypto"
+#define HAVE_CRYPTO
 #define HAVE_SHA512_T
 #elif defined(HAVE_OPENSSL_HMAC_H) && defined(HAVE_OPENSSL_EVP_H)
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
 #define USE_OPENSSL
+#define HASH_IMPLEMENTATION_NAME "OpenSSL"
 #ifdef HAVE_EVP_SHA512
 #define HAVE_SHA512_T
 #endif
@@ -208,25 +216,13 @@ typedef hash<64> sha512_t;
  * we define a function that returns the name of the digest.
  * These work for either type
  */
-template<typename T>
-inline std::string digest_name();
-template<>
-inline std::string digest_name<md5_t>() {
-    return "MD5";
-}
-template<>
-inline std::string digest_name<sha1_t>() {
-    return "SHA1";
-}
-template<>
-inline std::string digest_name<sha256_t>() {
-    return "SHA256";
-}
+inline std::string digest_implementation_name() { return HASH_IMPLEMENTATION_NAME; }
+template<typename T> inline std::string digest_name();
+template<> inline std::string digest_name<md5_t>() { return "MD5"; }
+template<> inline std::string digest_name<sha1_t>() { return "SHA1"; }
+template<> inline std::string digest_name<sha256_t>() { return "SHA256"; }
 #ifdef HAVE_SHA512
-template<>
-inline std::string digest_name<sha512_t>() {
-    return "SHA512";
-}
+template<> inline std::string digest_name<sha512_t>() { return "SHA512"; }
 #endif
 
 
@@ -239,6 +235,79 @@ inline std::string digest_name<sha512_t>() {
  * With OpenSSL, it's a cover for the EVP_MD system.
  * With CommonCrypto, we just call the functions directly.
  */
+
+#ifdef USE_GCRYPT
+template<enum gcry_md_algos mac_algo,size_t SIZE>
+class hash_generator__ { 			/* generates the hash */
+ private:
+    gcry_md_hd_t h {};                     // the hash value
+    bool finalized {false};
+    uint8_t *digest_ {nullptr};               // created
+    /* Not allowed to copy; these are prototyped but not defined,
+     * so any attempt to use them will fail, but we won't get the -Weffc++ warnings
+     */
+    hash_generator__ & operator=(const hash_generator__ &);
+    hash_generator__(const hash_generator__ &);
+public:
+    int64_t hashed_bytes {0};
+    /* This function takes advantage of the fact that different hash functions produce residues with different sizes */
+    hash_generator__(){
+        gcry_md_open(&h, mac_algo, 0);
+    }
+
+    ~hash_generator__(){
+        gcry_md_close(h);
+    }
+public:
+    void update(const uint8_t *buf,size_t bufsize){
+	if(finalized){
+	    std::cerr << "hashgen_t::update called after finalized\n";
+	    exit(1);
+	}
+        gcry_md_write(h, buf, bufsize);
+	hashed_bytes += bufsize;
+    }
+    hash<SIZE> digest() {
+	if(!finalized){
+            digest_ = gcry_md_read(h, mac_algo);
+            finalized = true;
+        }
+        return hash<SIZE>(digest_);
+    }
+
+    /** Compute a sha1 from a buffer and return the hash */
+    static hash<SIZE>  hash_buf(const uint8_t *buf,size_t bufsize){
+	hash_generator__ g;
+	g.update(buf, bufsize);
+	return g.digest();
+    }
+
+#ifdef HAVE_MMAP
+    static hash<SIZE> hash_file(const char *fname){
+	int fd = open(fname,O_RDONLY | HASHT_O_BINARY );
+	if(fd<0) throw fserror("open",errno);
+	struct stat st;
+	if(fstat(fd,&st)<0){
+	    close(fd);
+	    throw fserror("fstat",errno);
+	}
+	const uint8_t *buf = (const uint8_t *)mmap(0,st.st_size,PROT_READ,MAP_FILE|MAP_SHARED,fd,0);
+	if(buf==0){
+	    close(fd);
+	    throw fserror("mmap",errno);
+	}
+	hash<SIZE> s = hash_buf(buf,st.st_size);
+	munmap((void *)buf,st.st_size);
+	close(fd);
+	return s;
+    }
+#endif
+};
+typedef hash_generator__<GCRY_MD_MD5,16>    md5_generator;
+typedef hash_generator__<GCRY_MD_SHA1,20>   sha1_generator;
+typedef hash_generator__<GCRY_MD_SHA256,32> sha256_generator;
+typedef hash_generator__<GCRY_MD_SHA512,64> sha512_generator;
+#endif
 
 #ifdef USE_OPENSSL
 template<const EVP_MD *md(),size_t SIZE>

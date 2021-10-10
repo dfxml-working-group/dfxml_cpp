@@ -22,11 +22,11 @@ iblkfind_LDADD = ./libdfxml.la
 
 EXTRA_DIST = README.md
 
-check_PROGRAMS = testapp_catch2
+check_PROGRAMS = test_dfxml
 TESTS = $(check_PROGRAMS)
 
-testapp_catch2_SOURCES = testapp_catch2.cpp tests/catch.hpp
-testapp_catch2_LDADD = ./libdfxml.la
+test_dfxml_SOURCES = test_dfxml.cpp tests/catch.hpp
+test_dfxml_LDADD = ./libdfxml.la
 
 # https://stackoverflow.com/questions/15013672/use-autotools-with-readme-md
 # We provide README.md instead of README. This prevents autotools from complaining.
