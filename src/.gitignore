@@ -21,3 +21,4 @@ dfxml_config.h.in
 *.la
 *.d
 *.exe
+test_dfxml
