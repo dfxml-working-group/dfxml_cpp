@@ -45,12 +45,12 @@ jobs:
         run: |
           cd src
           bash bootstrap.sh
-          ./configure CFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' CXXFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' LIBS='-lgcov'
+          ./configure -q --with-no_optimize --enable-silent-rules \
+                 CFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' \
+                 CXXFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' \
+                 LIBS='-lgcov'
           make check
-          ls -l /usr/bin/gcov*
-          gcov-9 -abcfu *cpp *h
-          pwd
-          ls -l
+          gcov-9 -abcfu *cpp *h > /dev/null
           curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
           git status
 
