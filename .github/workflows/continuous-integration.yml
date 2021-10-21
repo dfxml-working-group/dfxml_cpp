@@ -48,10 +48,11 @@ jobs:
           ./configure CFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' CXXFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' LIBS='-lgcov'
           make check
           ls -l /usr/bin/gcov*
-          gcov-9 -n -o . *cpp
+          gcov-9 -abcfu *cpp *h
           pwd
           ls -l
           curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
+          git status
 
       - name: GCC Problem Matcher
         uses: ammaraskar/gcc-problem-matcher@0.1
