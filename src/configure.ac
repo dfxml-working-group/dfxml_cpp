@@ -1,7 +1,7 @@
 #                                               -*- Autoconf -*-
 #
 # This configure script is for creating dfxml_config.h, which is used for the
-# config file used by the unittest (testapp_catch2.cpp) program.
+# config file used by the unittest (test_dfxml) program.
 # That is the sole purpose of this script.
 #
 # It includes dfxml_configure.mx, which is a mix-in for using dfxml
