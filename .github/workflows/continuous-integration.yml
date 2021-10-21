@@ -56,4 +56,4 @@ jobs:
           ./configure CFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' CXXFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' LIBS='-lgcov'
           make check
           gcov-9 -n -o . *cpp
-          bash <(curl -s https://codecov.io/bash)
+          curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
