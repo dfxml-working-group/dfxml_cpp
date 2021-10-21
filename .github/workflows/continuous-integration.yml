@@ -47,8 +47,10 @@ jobs:
           bash bootstrap.sh
           ./configure CFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' CXXFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' LIBS='-lgcov'
           make check
+          ls -l /usr/bin/gcov*
           gcov-9 -n -o . *cpp
-          find . -print
+          pwd
+          ls -l
           curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
 
       - name: GCC Problem Matcher
