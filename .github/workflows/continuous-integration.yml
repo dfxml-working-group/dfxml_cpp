@@ -32,28 +32,27 @@ jobs:
           wget https://ftpmirror.gnu.org/autoconf/autoconf-2.71.tar.gz
           tar xfz autoconf-2.71.tar.gz && cd autoconf-2.71 && ./configure && make && sudo make install
 
-      - name: Compile C++ code
+      - name: Run C++ checks
+        if: startsWith(matrix.os, 'macos')
         run: |
           cd src
-          bash bootstrap.sh
-          ./configure
-          make
+          bash bootstrap.sh && ./configure && make check
 
-      - name: GCC Problem Matcher
-        uses: ammaraskar/gcc-problem-matcher@0.1
-
-      - name: Run C++ checks
-        run: |
-          make check
-
-
-      - name: Run codecov on the C++
+      - name: Run C++ checks with codecov
         if: startsWith(matrix.os, 'ubuntu')
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
           cd src
-          ./configure CFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' CXXFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' LIBS='-lgcov'
+          bash bootstrap.sh
+          ./configure -q --with-no_optimize --enable-silent-rules \
+                 CFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' \
+                 CXXFLAGS='-g -O0 -fprofile-arcs -ftest-coverage' \
+                 LIBS='-lgcov'
           make check
-          gcov-9 -n -o . *cpp
+          gcov-9 -abcfu *cpp *h > /dev/null
           curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
+          git status
+
+      - name: GCC Problem Matcher
+        uses: ammaraskar/gcc-problem-matcher@0.1
