@@ -1,0 +1,3 @@
+ignore:
+  - "src/testapp_catch.cpp"
+  - "src/tests/catch.hpp"
