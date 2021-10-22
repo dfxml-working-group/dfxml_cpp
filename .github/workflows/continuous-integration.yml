@@ -51,8 +51,24 @@ jobs:
                  LIBS='-lgcov'
           make check
           gcov-9 -abcfu *cpp *h > /dev/null
-          curl -Os https://uploader.codecov.io/latest/linux/codecov && chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
+
+          #
+          # set up and run codecov
+          #
+          sudo yum install gpg
+          curl https://keybase.io/codecovsecurity/pgp_keys.asc | \
+          gpg --no-default-keyring --keyring trustedkeys.gpg --import
+          curl -Os https://uploader.codecov.io/latest/linux/codecov
+          curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM
+          curl -Os https://uploader.codecov.io/latest/linux/codecov.SHA256SUM.sig
+          gpgv codecov.SHA256SUM.sig codecov.SHA256SUM
+          shasum -a 256 -c codecov.SHA256SUM
+          chmod +x codecov && ./codecov -t ${CODECOV_TOKEN}
+          #
+          # check cleanup
+          #
           git status
+
 
       - name: GCC Problem Matcher
         uses: ammaraskar/gcc-problem-matcher@0.1
