@@ -55,7 +55,7 @@ jobs:
           #
           # set up and run codecov
           #
-          sudo yum install gpg
+          sudo apt install gpg
           curl https://keybase.io/codecovsecurity/pgp_keys.asc | \
           gpg --no-default-keyring --keyring trustedkeys.gpg --import
           curl -Os https://uploader.codecov.io/latest/linux/codecov
