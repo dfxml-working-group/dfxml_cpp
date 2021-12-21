@@ -122,9 +122,9 @@ public:
     }
 
     // write to a file, optionally making a DTD
-    dfxml_writer(const std::filesystem::path &outfilename_, bool makeDTD):
-        outf(outfilename_.c_str(),std::ios_base::out),
-        tempfile_template( outfilename_.string()+"_tmp_XXXXXXXX"),
+    dfxml_writer(const std::filesystem::path outfilename_, bool makeDTD):
+        outf(outfilename_,std::ios_base::out),
+        tempfile_template( outfilename_.string() + "_tmp_XXXXXXXX"),
         outfilename(outfilename_) {
         if (!outf.is_open()){
             throw std::runtime_error(outfilename_.string());
@@ -161,7 +161,7 @@ public:
 
 private:
     std::mutex     M {};
-    std::fstream   outf;             // if we are writing to a file...
+    std::fstream   outf {};          // if we are writing to a file...
     std::ostream   *out {};          // where it is being written; defaults to stdout
     stringset_t    tags {};          // XML tags
     std::stack<std::string>tag_stack {};
