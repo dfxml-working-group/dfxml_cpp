@@ -115,8 +115,7 @@ public:
 
     /* This is the main interface: */
     // defaults to stdout
-    dfxml_writer():M(),outf(),out(&std::cout),tags(),tag_stack(),tempfilename(),tempfile_template("/tmp/xml_XXXXXXXX"),
-           t0(),t_last_timestamp(),make_dtd(false),outfilename(),oneline() {
+    dfxml_writer():out(&std::cout) {
         gettimeofday(&t0,0);
         gettimeofday(&t_last_timestamp,0);
         *out << xml_header;
@@ -124,9 +123,9 @@ public:
 
     // write to a file, optionally making a DTD
     dfxml_writer(const std::filesystem::path &outfilename_, bool makeDTD):
-        M(),outf(outfilename_.c_str(),std::ios_base::out), out(),tags(),tag_stack(),tempfilename(),
+        outf(outfilename_.c_str(),std::ios_base::out),
         tempfile_template( outfilename_.string()+"_tmp_XXXXXXXX"),
-        t0(),t_last_timestamp(),make_dtd(false),outfilename(outfilename_),oneline() {
+        outfilename(outfilename_) {
         if (!outf.is_open()){
             throw std::runtime_error(outfilename_.string());
         }
@@ -161,18 +160,18 @@ public:
     typedef std::set<std::string> tagid_set_t;
 
 private:
-    std::mutex     M;
+    std::mutex     M {};
     std::fstream   outf;             // if we are writing to a file...
-    std::ostream   *out;             // where it is being written; defaults to stdout
-    stringset_t    tags;             // XML tags
-    std::stack<std::string>tag_stack;
-    std::string    tempfilename;
-    std::string    tempfile_template;
-    struct timeval t0;
-    struct timeval t_last_timestamp;	// for creating delta timestamps
-    bool           make_dtd;
-    std::filesystem::path    outfilename;
-    bool           oneline;             // output entire DFXML on a single line. Can be toggled on and off
+    std::ostream   *out {};          // where it is being written; defaults to stdout
+    stringset_t    tags {};          // XML tags
+    std::stack<std::string>tag_stack {};
+    std::string    tempfilename {};
+    std::string    tempfile_template {"/tmp/xml_XXXXXXXX"};
+    struct timeval t0 {};
+    struct timeval t_last_timestamp {};	// for creating delta timestamps
+    bool           make_dtd {false};
+    std::filesystem::path    outfilename {};
+    bool           oneline {false};    // output entire DFXML on a single line. Can be toggled on and off
 
     void  write_doctype(std::fstream &out);
     void  write_dtd() {
