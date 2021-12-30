@@ -21,7 +21,8 @@ typedef unsigned __int32  uint32_t;
 #include <string>
 
 class CPUID {
-    uint32_t regs[4];
+    static inline const int REGS {4};
+    uint32_t regs[REGS];
 
 public:
     explicit CPUID(unsigned i) {
@@ -33,8 +34,8 @@ public:
              : "a" (i), "c" (0));
         // ECX is set to zero for CPUID function 4
 #else
-        for(auto it:regs){
-            it = 0xff;
+        for (int j=0; j< REGS; j++){
+  	    regs[j] = 0xff;
         }
 #endif
     }
