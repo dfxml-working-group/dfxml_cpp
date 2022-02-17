@@ -86,7 +86,6 @@ if test "$have_crypto" = NO; then
 fi
 
 if test "$have_crypto" = NO; then
-    echo foo
     AC_MSG_ERROR([CommonCrypto, SSL/OpenSSL, or gcrypt support required])
 fi
 AC_MSG_NOTICE([dfxml_cpp/src/dfxml_configure.m4 end])
