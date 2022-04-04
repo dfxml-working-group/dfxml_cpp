@@ -21,7 +21,9 @@ typedef unsigned __int32  uint32_t;
 #include <string>
 
 class CPUID {
+#if defined(_WIN32) || defined(HAVE_ASM_CPUID)
     uint32_t regs[4];
+#endif
 
 public:
     explicit CPUID(unsigned i) {
@@ -33,23 +35,24 @@ public:
              : "a" (i), "c" (0));
         // ECX is set to zero for CPUID function 4
 #else
-        for(auto it:regs){
-            it = 0xff;
-        }
 #endif
     }
 
+#if defined(_WIN32) || defined(HAVE_ASM_CPUID)
     const uint32_t &EAX() const {return regs[0];}
     const uint32_t &EBX() const {return regs[1];}
     const uint32_t &ECX() const {return regs[2];}
     const uint32_t &EDX() const {return regs[3];}
+#endif
 
     static std::string vendor() {
-        CPUID  cpuID(0);                     // get CPU vendor
         std::string vendor;
+#if defined(_WIN32) || defined(HAVE_ASM_CPUID)
+        CPUID  cpuID(0);                     // get CPU vendor
         vendor += std::string((const char *)&cpuID.EBX(), 4);
         vendor += std::string((const char *)&cpuID.EDX(), 4);
         vendor += std::string((const char *)&cpuID.ECX(), 4);
+#endif
         return vendor;
     }
 };
