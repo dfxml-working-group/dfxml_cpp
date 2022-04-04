@@ -11,10 +11,10 @@
 # LICENSE: LGPL Version 3. See COPYING.md for further information.
 #
 
-AC_MSG_NOTICE([Including dfxml_configure.m4 from dfxml])
-AC_MSG_NOTICE([Note: checks for libewf.h should be in the caller, so they can be disabled])
+AC_MSG_NOTICE([dfxml_cpp/src/dfxml_configure.m4 start])
 AC_CHECK_HEADERS([expat.h sys/resource.h sys/utsname.h unistd.h winsock2.h boost/version.hpp pwd.h uuid/uuid.h])
 AC_CHECK_FUNCS([gmtime_r getuid gethostname getpwuid getrusage vasprintf ])
+AC_MSG_NOTICE([dfxml_cpp/src/dfxml_configure.m4 checked initial headers and funcs])
 
 # Expat is required
 have_expat=yes
@@ -41,6 +41,7 @@ fi
 ################################################################
 ## On Win32, crypto requires zlib.
 ## On Win32, dfxml_writer requires GetProcessMemoryInfo, which requires psapi
+AC_MSG_NOTICE([dfxml_cpp/src/dfxml_configure.m4 mingw check1])
 case $host in
   *mingw32*)
   AC_CHECK_LIB([z], [gzdopen], [LIBS="-lz $LIBS"], [AC_MSG_ERROR([Could not find zlib library])])
@@ -55,6 +56,7 @@ esac
 ## Crypto Support
 ##
 ## MacOS CommonCrypto
+AC_MSG_NOTICE([dfxml_cpp/src/dfxml_configure.m4 crypto check])
 AC_CHECK_HEADERS([CommonCrypto/CommonDigest.h])
 
 ## gcrypt
@@ -84,6 +86,6 @@ if test "$have_crypto" = NO; then
 fi
 
 if test "$have_crypto" = NO; then
-    echo foo
     AC_MSG_ERROR([CommonCrypto, SSL/OpenSSL, or gcrypt support required])
 fi
+AC_MSG_NOTICE([dfxml_cpp/src/dfxml_configure.m4 end])
