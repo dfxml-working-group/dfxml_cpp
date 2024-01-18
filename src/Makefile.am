@@ -4,6 +4,9 @@
 DFXML_SRC_DIR =
 ACLOCAL_AMFLAGS = -I m4
 
+EXTRA_DIST = README.md Makefile.defs
+
+
 include Makefile.defs
 
 # Build dfxml as a library
@@ -19,8 +22,6 @@ dfxml_demo_LDADD = ./libdfxml.la
 
 iblkfind_SOURCES = iblkfind.cpp
 iblkfind_LDADD = ./libdfxml.la
-
-EXTRA_DIST = README.md
 
 check_PROGRAMS = test_dfxml
 TESTS = $(check_PROGRAMS)
